@@ -16,12 +16,15 @@ url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_cov
 
 def download_data(source):
     """Download details"""
-    return pd.read_csv(source)
+    try:
+        return pd.read_csv(source)
+    except OSError:
+        print("Error in downloading data!\nExiting...")
+        exit()
 
 
 # download data
 df = download_data(url)
-
 
 # creating dates list
 columns = list(df)

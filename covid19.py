@@ -4,12 +4,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
+import datetime as dt
+import matplotlib.dates as mdates
 
 countries = []
 selected_countries = ["Israel", "Netherlands"]
 dates = []
 infected = []
+date_interval = 5
 
 url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
@@ -51,11 +53,23 @@ for i in range(len(selected_countries)):
             for date in range(len(dates)):
                 infected[i][date] += row[1][4+date]
 
+
 # plot
+fig, ax = plt.subplots()
+x = [dt.datetime.strptime(d, '%m/%d/%y').date() for d in dates]
+
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y'))
+ax.xaxis.set_major_locator(mdates.DayLocator(interval=date_interval))
+
+
 for i in range(len(selected_countries)):
-    plt.plot(infected[i])
-plt.xlabel("Time")
+    plt.plot(x, infected[i])
+
+plt.xlabel("Date")
 plt.ylabel("Cases")
 plt.title("Covid-19")
 plt.legend(selected_countries)
+
+fig.autofmt_xdate()
+
 plt.show()

@@ -9,7 +9,6 @@ import matplotlib.dates as mdates
 
 countries = []
 selected_countries = ["Israel", "Netherlands"]
-dates = []
 infected = []
 date_interval = 5
 
@@ -25,26 +24,50 @@ def download_data(source):
         exit()
 
 
+def dates_create(df):
+    """Creating dates list"""
+    dates_list = []
+    columns = list(df)
+
+    for column in columns[4:]:  # first four columns aren't dates
+        dates_list.append(column)
+    return dates_list
+
+
+def countries_infected_details(df):
+    """Creating infected people numbers list"""
+    countries = []
+
+    for row in df.iterrows():
+        countries.append(row[1][1])
+    countries = list(set(countries))
+    return countries
+
+
+def empty_matrix_create(row, columns):  # currently not in use
+    """Creating matrix (row X columns) with zeroes inside each cell"""
+    matrix = []
+
+    for i in range(row):
+        matrix.append([])
+        for j in range(columns):
+            matrix[i].append([])
+            matrix[i][j] = 0
+    return matrix
+
+
 # download data
 df = download_data(url)
 
-# creating dates list
-columns = list(df)
-for column in columns[4:]:  # first four columns aren't dates
-    dates.append(column)
+# generate dates list
+dates = dates_create(df)
 
-# creating countries numbers list
-for row in df.iterrows():
-    countries.append(row[1][1])
-countries = list(set(countries))
+# creating countries infected numbers list
+countries = countries_infected_details(df)
 
 # create infected matrix
 infected = np.zeros((len(selected_countries), len(dates)), dtype=int)
-""" for i in range(len(selected_countries)):
-    infected.append([])
-    for j in range(len(dates)):
-        infected[i].append([])
-        infected[i][j] = 0 """
+
 
 # sum infected numbers(source contains duplicates)
 for i in range(len(selected_countries)):

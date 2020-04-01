@@ -8,7 +8,6 @@ import datetime as dt
 import matplotlib.dates as mdates
 
 countries = []
-selected_countries = ["Israel", "Netherlands"]
 infected = []
 date_interval = 5
 
@@ -56,6 +55,41 @@ def empty_matrix_create(row, columns):  # currently not in use
     return matrix
 
 
+def infected_calc(selected_countries, dates):
+    """Calculating infected numbers"""
+    # create infected matrix
+    infected = np.zeros((len(selected_countries), len(dates)), dtype=int)
+
+    # sum infected numbers(source contains duplicates)
+    for i in range(len(selected_countries)):
+        for row in df.iterrows():
+            if selected_countries[i] == row[1][1]:
+                for date in range(len(dates)):
+                    infected[i][date] += row[1][4+date]
+    return infected
+
+
+def plot(selected_countries, infected):
+    """Plot the selected countries details"""
+    fig, ax = plt.subplots()
+    x = [dt.datetime.strptime(d, '%m/%d/%y').date() for d in dates]
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y'))
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=date_interval))
+
+    for i in range(len(selected_countries)):
+        plt.plot(x, infected[i])
+
+    plt.xlabel("Date")
+    plt.ylabel("Cases")
+    plt.title("Covid-19")
+    plt.legend(selected_countries)
+
+    fig.autofmt_xdate()
+
+    plt.show()
+
+
 # download data
 df = download_data(url)
 
@@ -65,34 +99,9 @@ dates = dates_create(df)
 # creating countries infected numbers list
 countries = countries_infected_details(df)
 
-# create infected matrix
-infected = np.zeros((len(selected_countries), len(dates)), dtype=int)
-
-
-# sum infected numbers(source contains duplicates)
-for i in range(len(selected_countries)):
-    for row in df.iterrows():
-        if selected_countries[i] == row[1][1]:
-            for date in range(len(dates)):
-                infected[i][date] += row[1][4+date]
-
 
 # plot
-fig, ax = plt.subplots()
-x = [dt.datetime.strptime(d, '%m/%d/%y').date() for d in dates]
-
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y'))
-ax.xaxis.set_major_locator(mdates.DayLocator(interval=date_interval))
-
-
-for i in range(len(selected_countries)):
-    plt.plot(x, infected[i])
-
-plt.xlabel("Date")
-plt.ylabel("Cases")
-plt.title("Covid-19")
-plt.legend(selected_countries)
-
-fig.autofmt_xdate()
-
-plt.show()
+if __name__ == "__main__":
+    selected_countries = ["Israel", "Netherlands"]
+    infected = infected_calc(selected_countries, dates)
+    plot(selected_countries, infected)

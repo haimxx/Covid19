@@ -9,7 +9,9 @@ import matplotlib.dates as mdates
 
 countries = []
 infected = []
-date_interval = 5
+date_interval = 7
+df = pd.DataFrame()
+
 
 url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
@@ -19,8 +21,7 @@ def download_data(source):
     try:
         return pd.read_csv(source)
     except OSError:
-        print("Error in downloading data!\nExiting...")
-        exit()
+        return pd.DataFrame()
 
 
 def dates_create(df):
@@ -55,7 +56,7 @@ def empty_matrix_create(row, columns):  # currently not in use
     return matrix
 
 
-def infected_calc(selected_countries, dates):
+def infected_calc(selected_countries, dates, df):
     """Calculating infected numbers"""
     # create infected matrix
     infected = np.zeros((len(selected_countries), len(dates)), dtype=int)
@@ -69,7 +70,7 @@ def infected_calc(selected_countries, dates):
     return infected
 
 
-def plot(selected_countries, infected):
+def plot(selected_countries, infected, dates):
     """Plot the selected countries details"""
     fig, ax = plt.subplots()
     x = [dt.datetime.strptime(d, '%m/%d/%y').date() for d in dates]
@@ -90,18 +91,20 @@ def plot(selected_countries, infected):
     plt.show()
 
 
-# download data
-df = download_data(url)
-
-# generate dates list
-dates = dates_create(df)
-
-# creating countries infected numbers list
-countries = countries_infected_details(df)
-
-
-# plot
 if __name__ == "__main__":
+    # download data
+    df = download_data(url)
+    if df.empty:
+        print("Error while downloading data\nExiting...")
+        exit(1)
+
+    # generate dates list
+    dates = dates_create(df)
+
+    # creating countries infected numbers list
+    countries = countries_infected_details(df)
+
+    # plot
     selected_countries = ["Israel", "Netherlands"]
-    infected = infected_calc(selected_countries, dates)
-    plot(selected_countries, infected)
+    infected = infected_calc(selected_countries, dates, df)
+    plot(selected_countries, infected, dates)

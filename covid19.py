@@ -12,8 +12,10 @@ infected = []
 date_interval = 7
 df = pd.DataFrame()
 
-
-url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+# Source datails
+infected_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+recovered_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"
+dead_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
 
 
 def download_data(source):
@@ -70,7 +72,16 @@ def infected_calc(selected_countries, dates, df):
     return infected
 
 
-def plot(selected_countries, infected, dates):
+def total_calc(df):
+    """Calculating total pepole numbers"""
+
+    total = 0
+    for row in df.iterrows():
+        total += row[1][len(df.columns)-1]
+    return total
+
+
+def plot(selected_countries, figures, dates):
     """Plot the selected countries details"""
     fig, ax = plt.subplots()
     x = [dt.datetime.strptime(d, '%m/%d/%y').date() for d in dates]
@@ -79,7 +90,7 @@ def plot(selected_countries, infected, dates):
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=date_interval))
 
     for i in range(len(selected_countries)):
-        plt.plot(x, infected[i])
+        plt.plot(x, figures[i])
 
     plt.xlabel("Date")
     plt.ylabel("Cases")
@@ -93,7 +104,7 @@ def plot(selected_countries, infected, dates):
 
 if __name__ == "__main__":
     # download data
-    df = download_data(url)
+    df = download_data(infected_url)
     if df.empty:
         print("Error while downloading data\nExiting...")
         exit(1)

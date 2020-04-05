@@ -20,12 +20,34 @@ root.title("Covid19")
 # root.geometry("800x800")
 # root.iconbitmap("CV.ico")
 
-""" date = "1/3/20"
-    status = tk.Label(
-    root, text=f"Data is updated to {date}", bd=1, relief=tk.SUNKEN, anchor=tk.W)
-label = tk.Label(root, text="Covid19")
-label.grid()
-status.grid(sticky=tk.W+tk.E) """
+
+about_text = """
+Developed by haimxx.
+github.com/haimxx"""
+
+
+def show_about():
+    tk.messagebox.showinfo("About Covid19", about_text)
+
+
+help_text = """This app shows details about the Coronavirus spread around the world.
+It plots the numbers of the selected infected countries.
+
+Please select the desired countries from the list and enter \"Plot\""""
+
+
+def show_help():
+    tk.messagebox.showinfo("Help", help_text)
+
+
+# menu
+menubar = tk.Menu(root)
+helpmenu = tk.Menu(menubar)
+helpmenu.add_command(label="Help", command=show_help)
+helpmenu.add_command(label="About", command=show_about)
+helpmenu.add_command(label="Exit", command=root.destroy)
+menubar.add_cascade(label="Menu", menu=helpmenu)
+
 
 df = download_data(infected_url)
 if df.empty:
@@ -71,4 +93,5 @@ for country in range(len(countries)):
 country_sum.grid(row=4, column=0)
 sum_frame.grid(row=0, column=3)
 
+root.config(menu=menubar)
 root.mainloop()
